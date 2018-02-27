@@ -71,14 +71,20 @@ window.prompt('Ont://getSocialClaim?params=' + result)
 | 102   | PARAMETERS ERROR           |
 | 103   | OAUTH ERROR                |
 | 104   | USER CANCELLED             |
+| 105   | BLOCKCHAIN ERROR 入链失败  |
 
 
 
-### claim 发送到 区块链
+### 将 claim 发送到 区块链
 
 
 
-```
-// websoocket
-```
+1、构造交易；
 
+2、发送交易；
+
+3、websocket事件等待入链；
+
+
+
+如果入链时间过长，或者一直没有入链，则APP一直监听不到prompt，可能APP原生还需要设置一个timeout
