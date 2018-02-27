@@ -1,5 +1,3 @@
-
-
 ## Social Verification
 
 
