@@ -52,6 +52,8 @@ window.prompt('Ont://returnToNative?params=' + result)
 | 0     | SUCCESS  |
 | 101   | 用户取消 |
 | 102   | 网络故障 |
+| 103   |          |
+| 104   | 参数错误 |
 
 
 
