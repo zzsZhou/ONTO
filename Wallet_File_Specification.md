@@ -1,4 +1,4 @@
-#Wallet File Specification
+# Wallet File Specification
 
 ## Wallet
 
@@ -195,3 +195,20 @@ Contract object has the following structure:
 ```parameters``` is an array of Parameter objects which describe the details of each parameter in the contract function.
 
 ```deployed``` indicates whether the contract has been deployed to the blockchain.
+
+## QR Code Specification 
+
+This is QR Code Specification for both indentity and account. 
+
+```
+{
+	"type":"I",
+	"algorithm": "ECDSA",
+	"key":"6PYT85poeK8XpuQhnroArEov64NfRsEeB4KiGD1YCoq5xU7sJrnXC92Vey",
+	"parameters": {
+		 "curve": "secp256r1"
+	}
+}
+```
+
+```type``` used to distinguish between indentity or account, **I** indicates this is an indentity , **A** indicates this is an account.
