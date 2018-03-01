@@ -203,6 +203,7 @@ This is QR Code Specification for both indentity and account.
 ```
 {
 	"type":"I",
+	"label": "MyIdentity",
 	"algorithm": "ECDSA",
 	"key":"6PYT85poeK8XpuQhnroArEov64NfRsEeB4KiGD1YCoq5xU7sJrnXC92Vey",
 	"parameters": {
