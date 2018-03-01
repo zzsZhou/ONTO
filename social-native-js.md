@@ -2,24 +2,12 @@
 
 
 
-### 流程图
-
-
-
-![](http://on-img.com/chart_image/5a952471e4b04932f89cde03.png)
-
-
-
-
-
 ### native call js
 
 
 
 ```
-socialVerify(context, ontid, encryptedPrivateKey, passwd) {
-    // ...
-}
+http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a5452616a31684377615135336264525450635a78596950415a364d61376a6351564b&encryptedPrivateKey=6PYRC4fgNSq7uVC7dUCLbb9GpjnTcFwLqDMQ2zAAX7NNqH47tfirgsNEQw&deviceCode=
 ```
 
 
@@ -38,51 +26,16 @@ socialVerify(context, ontid, encryptedPrivateKey, passwd) {
 
 
 
-### js return claim to native
+### js return to native
 
 
 
-```
-window.prompt('Ont://getSocialClaim?params=' + result)
-```
-
-
-
-`result`:
+用户点击取消按钮，或者最后的完成按钮，返回到原生
 
 ```
-{
-  Error: 0,
-  Data: {
-      // claim content
-  },
-  Desc: 'SUCCESS'
-}
+window.prompt('Ont://returnToNative')
 ```
 
 
 
-| Error | Desc                       |
-| ----- | -------------------------- |
-| 0     | SUCCESS                    |
-| 101   | PRIVATE KEY PASSWORD ERROR |
-| 102   | PARAMETERS ERROR           |
-| 103   | OAUTH ERROR                |
-| 104   | USER CANCELLED             |
-| 105   | BLOCKCHAIN ERROR 入链失败  |
-
-
-
-### 将 claim 发送到 区块链
-
-
-
-1、构造交易；
-
-2、发送交易；
-
-3、websocket事件等待入链；
-
-
-
-如果入链时间过长，或者一直没有入链，则APP一直监听不到prompt，可能APP原生还需要设置一个timeout
+# 
