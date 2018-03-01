@@ -30,11 +30,28 @@ http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f
 
 
 
-用户点击取消按钮，或者最后的完成按钮，返回到原生
+```
+window.prompt('Ont://returnToNative?params=' + result)
+```
+
+
+
+`result`:
 
 ```
-window.prompt('Ont://returnToNative')
+{
+  Error: 0,
+  Desc: 'SUCCESS'
+}
 ```
+
+
+
+| Error | Desc     |
+| ----- | -------- |
+| 0     | SUCCESS  |
+| 101   | 用户取消 |
+| 102   | 网络故障 |
 
 
 
