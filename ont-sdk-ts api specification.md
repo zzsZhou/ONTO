@@ -1,7 +1,5 @@
 # ONT SDK 接口文档
 
-Notice:This sdk exports everything in one global variable "Ont". You should use any class or object as the attribute of Ont.For example, If you want to use class Account, you should use Ont.Account.
-
 注意：这个sdk 到处了一个包含所有内容的全局变量“Ont”。使用时需要在Ont的命名空间下。如如使用类Account，需要写成“Ont.Account”。
 
 ## 1 钱包 Wallet
@@ -37,13 +35,13 @@ Notice:This sdk exports everything in one global variable "Ont". You should use 
 
 `scrypt` 是加密算法所需的参数，该算法是在钱包加密和解密私钥时使用。
 
-`identities` 是钱包中所有数字身份对象的数组
+`identities` 是钱包中所有数字身份对象的数组。
 
-```accounts``` 是钱包中所有数字资产账户对象的数组
+```accounts``` 是钱包中所有数字资产账户对象的数组。
 
 ```extra``` 是客户端由开发者用来存储额外数据字段，可以为null。
 
-希望了解更多钱包数据规范请参考[Wallet_File_Specification](https://github.com/ontio/opendoc/blob/master/resources/specifications/Wallet_File_Specification.md).
+希望了解更多钱包数据规范请参考[Wallet\_File_Specification](https://github.com/ONTIO-Community/ONTO/blob/master/Wallet_File_Specification.md).
 
 ### 1.1 创建钱包
 
@@ -55,11 +53,11 @@ Notice:This sdk exports everything in one global variable "Ont". You should use 
 
 **password** 密码。用来加密解密私钥。
 
-**callback** 原生里定义的回调函数名，用来接收sdk返回的结果。关于sdk和原生交互的详细情况见 [5.sdk和原生的交互](#5)
-
-该方法会通过回调将创建好的钱包文件，返回给原生。此时，钱包还并未真正创建，需要将钱包中身份的ONT ID注册到链上，当链推送回正确消息时，创建成功。
+**callback** 原生里定义的回调函数名，用来接收sdk返回的结果。关于sdk和原生交互的详细情况见 [sdk和原生的交互](#5)。
+该方法会通过回调将创建好的钱包文件，以JSON字符串的形式，返回给原生。此时，钱包还并未真正创建，需要将钱包中身份的ONT ID注册到链上，当链推送回上链成功的消息时，代表钱包和身份创建成功。
 
 ```
+//1.创建钱包文件
 var walletDataStr = Ont.SDK.createWallet('zhangsan', '123456', 'callback')
 console.log(walletDataStr)
 ```
@@ -71,27 +69,43 @@ console.log(walletDataStr)
 **callback** 原生的回调函数名
 
 ````
-//register ONT ID
+//2.注册ONT ID
 Ont.SDK.registerOntid(walletDataStr, callback)
 ````
 
 该方法会启动一个websocket客户端，将参数构建为交易对象，发到链上，并监听链返回交易确认的消息，这个过程预计需要6秒，所以在回调被调用前，原生应显示等待状态。通过判断回调返回的消息，确认注册是否成功。
 
+创建的流程图详见如下：
+
+![创建身份流程图](http://on-img.com/chart_image/5a9919cce4b09ac3a0c5cbec.png)
+
 如果返回的消息中包含错误，错误码详见[7.错误码](#7) ，原生可以根据错误情况，选择重新注册，或其他处理。
 
-## 1.2 导入身份
+如果返回成功结果的消息，则继续做成功创建的后续处理。
 
-导入身份需要用户提供加密后的私钥和密码。
+### 1.2 导入身份
 
-导入的过程是：先检查加密后的私钥和密码是否正确。然后根据私钥生成ONT ID, 并检查ONT ID是否在链上。如果不存在，回调返回相应错误码；如果存在，则生成身份和钱包文件，把身份加入到钱包中，回调返回钱包文件。
+导入身份需要用户提供**身份的名称，加密后的私钥**和**密码**。
+
+**label** 是要导入的身份的名称，可以为空，为空时，sdk会提供自定义生成的名称。
+
+**encryptedPrivateKey ** 加密后私钥，
+
+**password** 密码。
+
+导入的过程是：先检查加密后的私钥和密码是否正确。然后根据私钥生成ONT ID, 并检查ONT ID是否在链上。如果不存在，回调会返回相应错误码；如果存在，则生成身份和钱包文件，把身份加入到钱包中，回调返回钱包文件。
+
+导入身份的流程图如下：
+
+![导入身份](http://on-img.com/chart_image/5a991d34e4b0337bad178b8c.png)
 
 ```
-Ont.SDK.importIdentity(encryptedPrivateKey, password, callback)
+Ont.SDK.importIdentity(label,encryptedPrivateKey, password, callback)
 ```
 
-## 2. Identity 
+## 2. 身份Identity 
 
-### Class identity has following structure:
+#### Identity 具有以下数据结构
 
 ```
 {
@@ -99,69 +113,45 @@ Ont.SDK.importIdentity(encryptedPrivateKey, password, callback)
   label : string,
   isDefault : boolean,
   lock : boolean,
-  controls : array of controlData,
+  controls : array of ControlData,
   extra : null
 }
 ```
 
-`ontid` is the ontid of the identity.
+```ontid``` 是代表身份的唯一的id
 
-`label` is a label that the user has made to the identity.
+`label` 是用户给身份所取的名称。
 
-`isDefault` indicates whether the identity is the default identity.
+`isDefault` 表明身份是用户默认的身份。默认值为false。
 
-`lock` indicates whether the identity is locked by user. The client shouldn't update the infomation in a locked identity.
+`lock` 表明身份是否被用户锁定了。客户端不能更新被锁定的身份信息。默认值为false。
 
-`controls` is an array of Controller objects which describe the details of each controller in the identity.
+`controls` 是身份的所有控制对象**ControlData**的数组。
 
-`extra` is an object that is defined by the implementor of the client for storing extra data. This field can be null.
+`extra` 是客户端开发者存储额外信息的字段。可以为null。
 
-### Class controlData has following structure:
+#### ControlData 具有以下数据结构
 
 ```
 {
   algorithm: string;
-  parameters: {
-  	curve: string;
-  };
+  parameters: {};
   id: string;
   key: string;
 }
 ```
 
-`algorithm` is the algorithms used in encryption system.
+`algorithm` 是用来加密的算法名称。
 
-`parameters` is the array of parameter objects used in encryption system.
+`parameters` 是加密算法所需参数。
 
-`id` is the identify of this control.
+`id` 是control的唯一标识。
 
-`key` is the private key of the account in the NEP-2 format. This field can be null (for watch-only address or non-standard address).
+`key` 是NEP-2格式的私钥。该字段可以为null（对于只读地址或非标准地址时）。
 
-```curve``` is the name of the elliptic curve.
+## 3 账户 Account
 
-### 2.1 Create an identity
-
-You need to pass these parameters:
-
-**privateKey** the private key
-
-**password** the password
-
-**label** the label of the identity
-
-**callback** the callback name on native side. Sdk will send back result with it.
-
-This method will generate one Ont ID for the idenity and register the Ont ID to the blockchain. If the register process meets error, sdk will send result with error info back to native side. 
-
-```
-//call createSecp256r1, return a identityData json string
-var identityDataStr = Ont.SDK.createIdentity(privateKey, password, label, callback)
-console.log(identityDataStr)
-```
-
-## 3. Acccount
-
-### Class account has following basic structure:
+#### Account 具有以下数据结构。
 
 ```
 {
@@ -170,34 +160,32 @@ console.log(identityDataStr)
   isDefault : boolean,
   lock : boolean,
   algorithm : boolean,
-  parameters : {
-    curve : string
-  },
+  parameters : {},
   key : string,
   contract : {}
   extra : null
 }
 ```
 
-```address``` is the base58 encoded address of the acccount.
+```address``` 是base58编码的账户地址。
 
-```label``` is a label that user has made to the account.
+```label``` 是账户的名称。
 
-`isDefault` indicates whether the account is the default change account.
+`isDefault` 表明账户是否是默认的账户。默认值为false。
 
-`lock` indicates whether the account is locked by user. The client shouldn't spend the funds in a locked account.
+`lock` 表明账户是否是被用户锁住的。客户端不能消费掉被锁的账户中的资金。
 
-`algorithm` is the algorithms used in encryption system.
+`algorithm` 是加密算法名称。
 
-`parameters` is the parameter objects used in encryption system.
+`parameters` 是加密算法所需参数。
 
-`key` is the private key of the account in the NEP-2 format. This field can be null (for watch-only address or non-standard address).
+`key` 是NEP-2格式的私钥。该字段可以为null（对于只读地址或非标准地址）。
 
-`contract` is a Contract object which describes the details of the contract. This field can be null (for watch-only address).
+`contract` 是智能合约对象。该字段可以为null（对于只读的账户地址）。
 
-`extra` is an object that is defined by the implementor of the client for storing extra data. This field can be null.
+`extra` 是客户端存储额外信息的字段。该字段可以为null。
 
-### Contract has the following structure:
+#### Contract 具有以下数据结构
 
 ```
 {
@@ -207,25 +195,23 @@ console.log(identityDataStr)
 }
 ```
 
-`script` is the script code of the contract. This field can be null if the contract has been deployed to the blockchain.
+`script` 是智能合约的脚本。当合约已经被部署到区块链上时，该字段可以为null。
 
-`parameters` is an array of Parameter objects which describe the details of each parameter in the contract function.
+`parameters` 是智能合约中函数所需的参数对象，组成的数组。
 
-`deployed` indicates whether the contract has been deployed to the blockchain.
+`deployed` 表明合约是否已被部署到区块链上。默认值为false。
 
-### 3.1 Create an Account
+### 3.1 创建账户
 
-You need to pass these parameters:
+用户需要传的参数说明如下：
 
-**privateKey** the private key
+**password** 密码
 
-**password** the password
+**label** 账户的名称
 
-**label** the label of the identity
+**callback** 回调函数名。
 
-**callback** the callback name on native side. Sdk will send back result with it.
-
-This method will send result back to native side .
+该方法会通过回调，将创建的账户返回JSON格式的
 
 ```
 //create an account by using secp256r1, return a json string
@@ -233,14 +219,14 @@ var accountDataStr = Ont.SDK.createAccount( privateKey, '123456', 'zhangsan', ca
 console.log(accountDataStr)
 ```
 
-## 4 Claim
+### 4 声明 Claim
 
-### Claim has following structure:
+#### Claim 具有以下数据结构
 
 ```
 {
   unsignedData : string,
-  signedData : string,
+  SignedData : string,
   Context : string,
   Id : string,
   Content : {},
@@ -249,54 +235,54 @@ console.log(accountDataStr)
 }
 ```
 
-```unsignedData``` is the json string of claim body, which includes Context, Id, Claim and Metadata.
+```unsignedData``` 是未被签名的声明对象的json格式字符串，声明对象包含Context, Id, Claim, Metadata这些字段。
 
-```signedData ``` is the json string of signed claim, which includes claim body and signature.
+```SignedData ``` 是声明对象被签名后的json格式字符串，该json包含声明对象和签名对象。
 
-```Context``` is the identity of claim template. We have following alternative values :
+```Context``` 是声明模板的标识。目前有以下可选的值：
 
-**claim:eid_authentication** is for Chinese citizen ceritification.
+**claim:eid_authentication** 代表中国公民认证。
 
-**claim:twitter_authentication** is for twitter authentication.
+**claim:twitter_authentication** 代表twitter的认证。
 
-**claim:facebook_authentication** is for facebook authentication.
+**claim:facebook_authentication** 代表facebook的认证。
 
-**claim:github_authentication** is for github authentication.
+**claim:github_authentication** 代表github的认证。
 
-**claim:linkedin_authentication** is for linkedin authentication.
+**claim:linkedin_authentication** 代表linkedin的认证。
 
-```Id``` is the identity of the claim.
+```Id``` 是声明对象的标识。
 
-```Content``` is the content of the claim, which is a json object.
+```Content``` 是声明的内容，格式为JSON对象。
 
-```Metadata``` is the metadata of the claim.
+```Metadata``` 是声明对象的元数据。
 
-### Class Metadata has following structure:
+#### Metadata 具有以下数据结构
 
 ```
 {
-  CreateTime : datetime,
+  CreateTime : datetime string
   Issuer : string,
   Subject : string,
-  Expires : date,
+  Expires : datetime string
   Revocation : string,
   Crl : string
 }
 ```
 
-```Createtime``` is the creation time of the claim. It's in ISO format: yyyyMMdd'T'HHmmss'Z' .
+```Createtime``` 是声明的创建时间。
 
-```Issuer``` is the ontid of the claim issuer. **For self-certified claim, this is the user's ontid. **
+```Issuer``` 是声明的发布者。对于自认证声明，该值是用户的ONT ID。
 
-```Subject``` is the subject of the claim. **For self-certified claim, this is the user's ontid.**
+``Subject`` 是声明的主语。对于自认证声明，该值是用户的ONT ID。
 
-```Expires``` is the expire time of the claim. The value can be null if no expires.
+```Expires``` 是声明的过期时间。该值可以为空，标识没有过期时间。
 
-```Revocation``` is the revocation method of the claim.**For self-certified claim, this value is no need.**
+```Revocation``` 是声明撤销方法。对于自认证声明，不需要该值。
 
-```Crl``` is the link to the revocation list..**For self-certified claim, this value is no need.**
+```Crl``` 是声明撤销列表的链接。对于自认证声明，不需要该值。
 
-### Class Signature has following structure:
+#### Signature 具有以下数据结构
 
 ```
 {
@@ -306,60 +292,29 @@ console.log(accountDataStr)
 }
 ```
 
-```Format``` is the the format of the signature.
+```Format``` 是签名的格式。
 
-```Algorithm``` is the signature algorightm.
+```Algorithm``` 是签名的算法。
 
-```Value``` is the signed value of the signature.
+```Value``` 是计算后的签名值。
 
-### 4.1 Sign a self-certified claim
+### 4.1 生成签名
 
-You should pass following parameters to create a signed claim:
-
-**context** the identity of claim template.
-
-**claimData** is the json string of the claim content. Here we have a simple example below.
-
-**ontid** is user's Ont Id.
-
-**encryptedPrivateKey** is user's encrypted privateKey .
-
-**password** is user's password.
-
-This method will check the ontid, encryptedPrivateKey and password. It will return signed json string as result. If anything goes wrong, it will return result with error info.
-
-```
-//sign a claim with specific parameters and user's private key.
-var claimBody = {name:'zhangsan', age:'25'}
-var claimData = JSON.stringify(claimBody)
-var claim = Ont.SDK.signSelfClaim(context, claimData, ontid, encryptedPrivateKey,password, callback)
-```
-
-### 4.2 Make a signature
-
-This is a common method to make a signature for any data you want. You need to offer data string and private key. There is one optional  parameter called "callback", which is the callback name on native side.
+用于对输入内容生成签名的方法，该方法会通过回调返回签名后的字符串。
 
 ```
 let signatureValue = Ont.core.signatureData(data, privateKey, callback)
 console.log(signatureValue)
 ```
 
-### 4.3 Decrypt encrypted privte key with password
+### 4.2 解密私钥
 
-For secuity, user can only access encrypted privte key. User can get the private key with password by decrypting the encrypted private key.
+系统中为了安全，避免直接操作明文私钥。在需要使用明文私钥时，SDK提供了根据密码解密出明文私钥的方法。
 
-This method will return the private key. If encryptedPrivateKey or password is error, it will return result with error info.
-
-```
-var privateKey = Ont.SDK.decryptEncryptedPrivateKey( encryptedPrivateKey, password, callback)
-```
-
-### 4.4 Encrypt private key with password
-
-Here is the method to encrypt private key with password.
+如果能够解出私钥，该方法通过回调返回私钥；如果不能解出，会返回相应错误码。
 
 ```
-var encryptedPrivateKey = Ont.SDK.encryptPrivateKey( privateKey, password, callback)
+var encryptedPrivateKey = Ont.SDK.encryptPrivateKey( encryptedPrivateKey, password, callback)
 ```
 
 ### 4.5 发送认证声明到链上并验证是否发送成功
@@ -441,25 +396,27 @@ const socket = new WebSocket(socket_url)
 
 
 
-### 5   sdk和原生的交互 
+## 5   SDK和原生的交互 
 
-### 5.1 Native call sdk
+### 5.1 原生调用SDK
 
-This sdk will export everything in one js file and one global variable named "Ont". You can call methods directly.For example, use  the "jsBridge" technology. If you want to get the return value of sdk's methods. Normally，You should pass one extra parameter named "callback", it's the function name on the native side. Sdk will call the callback to send result back to native.
+原生可以通过于js交互的技术，直接调用SDK中暴露的内容，如“jsBridge”技术。
 
-### 5.2 Sdk send result back to native
+如果想要得到SDK中方法的返回值，需要通过传递参数callback给SDK的方法，callback是原生定义的回调方法名，SDK在方法调用结束后，通过发起prompt事件，将结果和callback发出，原生拦截prompt事件，获取到函数结果和callback，运行相应方法，处理函数结果。
 
-There is one protocol between webview and native.
+### 5.2 SDK返回结果给原生
+
+原生的webview和SDK之间定义的协议如下：
 
 ```
 Ont://callback?params=result
 ```
 
-```Ont``` is fixed.
+```Ont``` 是固定值。
 
-```callback``` is the callback name on native side.
+```callback``` 是原生定义的回调函数名。
 
-```params=result``` is sent to native side to get the result. Result is json string.
+```params=result``` result就是发送给原生的函数调用结果。
 
 ```
 // native side call sdk to create a wallet, the callback name is 'getWalletDataStr'
@@ -475,13 +432,9 @@ getWalletDataStr(walletSataStr) {
 }
 ```
 
-### 6 Qrcode specification for backup identity
+### 6 二维码规范
 
-The Qrcode should contain following content:
-
-```
-identity json string & encryptedPrivateKey & ontid
-```
+详见[Wallet\_File_Specification](https://github.com/ONTIO-Community/ONTO/blob/master/Wallet_File_Specification.md) 中有关二维码部分。
 
 ### 7 错误码
 
