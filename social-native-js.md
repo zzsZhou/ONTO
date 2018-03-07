@@ -7,7 +7,7 @@
 
 
 ```
-http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a5452616a31684377615135336264525450635a78596950415a364d61376a6351564b&encryptedPrivateKey=6PYRC4fgNSq7uVC7dUCLbb9GpjnTcFwLqDMQ2zAAX7NNqH47tfirgsNEQw&deviceCode=device11434eae00cd45a8b91b76ba7e7ea133
+http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a5452616a31684377615135336264525450635a78596950415a364d61376a6351564b&encryptedPrivateKey=6PYRC4fgNSq7uVC7dUCLbb9GpjnTcFwLqDMQ2zAAX7NNqH47tfirgsNEQw&deviceCode=device38b7902a0c624b42a42ade31b1ad7779&lang=zh_hans
 ```
 
 
@@ -23,6 +23,18 @@ http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f
 **claim:linkedin_authentication** is for linkedin authentication.
 
 
+
+`ontid`
+
+`encryptedPrivateKey`
+
+`deviceCode`
+
+`lang`: 
+
+​    `en_us`     英文
+
+​    `zh_hans`   中文简体
 
 
 
@@ -47,15 +59,16 @@ window.prompt('Ont://returnToNative?params=' + result)
 
 
 
-| Error | Desc     |
-| ----- | -------- |
-| 0     | SUCCESS  |
-| 101   | 用户取消 |
-| 102   | 网络故障 |
-| 103   | 超时     |
-| 104   | 参数错误 |
-| 105   | 托管错误 |
-| 106   | 入链错误 |
+| Error | Desc            |
+| ----- | --------------- |
+| 0     | SUCCESS         |
+| 101   | 用户取消        |
+| 102   | 网络故障        |
+| 103   | 超时            |
+| 104   | 参数错误        |
+| 105   | 托管失败        |
+| 106   | 入链失败        |
+| 107   | onchain签名失败 |
 
 
 
