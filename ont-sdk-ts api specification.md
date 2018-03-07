@@ -54,26 +54,28 @@
 **password** 密码。用来加密解密私钥。
 
 **callback** 原生里定义的回调函数名，用来接收sdk返回的结果。关于sdk和原生交互的详细情况见 [sdk和原生的交互](#5)。
-该方法会通过回调将创建好的钱包文件，以JSON字符串的形式，返回给原生。此时，钱包还并未真正创建，需要将钱包中身份的ONT ID注册到链上，当链推送回上链成功的消息时，代表钱包和身份创建成功。
+该方法会通过回调将创建好的钱包文件，以JSON字符串的形式，返回给原生。在创建的过程中，需要将钱包中身份的ONT ID注册到链上，注册成功时，代表钱包和身份创建成功。
+
+注册的过程是通过发送相关的交易到链上并被区块接收，这个过程比较耗时，客户端一直等待将会十分影响用户体验，所以注册的过程只需要发送交易，不需要等待确认结果。只要保证交易成功创建和发送，就极大概率上保证上链成功。
+
+注册的过程会耗时约**5秒钟**。
 
 ```
-//1.创建钱包文件
-var walletDataStr = Ont.SDK.createWallet('zhangsan', '123456', 'callback')
-console.log(walletDataStr)
+
+Ont.SDK.createWallet('zhangsan', '123456', 'callback')
+
 ```
 
-**注册ONT ID** 所需参数说明如下：
-
-**walletDataStr** 上一步创建的钱包文件，JSON字符串格式
-
-**callback** 原生的回调函数名
+这个方法内部会创建出相应的交易对象，通过websocket或http发送请求到链上。当交易成功发送后，回调返回创建好的钱包对象JSON格式字符串；否则回调会返回错误信息。错误信息是如下结构：
 
 ````
-//2.注册ONT ID
-Ont.SDK.registerOntid(walletDataStr, callback)
+{
+	error : string, //错误码 
+	desc : string // 错误描述
+}
 ````
 
-该方法会启动一个websocket客户端，将参数构建为交易对象，发到链上，并监听链返回交易确认的消息，这个过程预计需要6秒，所以在回调被调用前，原生应显示等待状态。通过判断回调返回的消息，确认注册是否成功。
+
 
 创建的流程图详见如下：
 
@@ -298,34 +300,65 @@ console.log(accountDataStr)
 
 ```Value``` 是计算后的签名值。
 
-### 4.1 生成签名
+### 4.1 构造自认证声明并签名该声明
 
-用于对输入内容生成签名的方法，该方法会通过回调返回签名后的字符串。
+该方法所需参数说明如下：
+
+**context** 声明模板的标识。该值为字符串。
+
+**claimData** 要声明的内容，JSON字符串格式。
+
+**ontid** 用户的ONT ID。
+
+**encryptedPrivateKey** 用户加密后的私钥。
+
+**password** 用户的密码。
+
+**callback** 回调函数名。该值为可选参数。
+
+当传入参数正确，返回声明对象，该对象中的signedData是签名后的数据。
+
+如果传入的callback，会通过回调返回声明对象的JSON格式字符串。
+
+````
+var claim = Ont.SDK.signSelfClaim(context, claimData, ontid, encryptedPrivateKey, password, callback)
+````
+
+### 4.2 工具方法 -- 生成签名
+
+用于对输入内容生成签名的方法，该方法会返回签名后的字符串。
 
 ```
-let signatureValue = Ont.core.signatureData(data, privateKey, callback)
+let signatureValue = Ont.core.signatureData(data, privateKey)
 console.log(signatureValue)
 ```
 
-### 4.2 解密私钥
+### 4.3 工具方法 — 解密私钥
 
 系统中为了安全，避免直接操作明文私钥。在需要使用明文私钥时，SDK提供了根据密码解密出明文私钥的方法。
 
 如果能够解出私钥，该方法通过回调返回私钥；如果不能解出，会返回相应错误码。
 
 ```
-var encryptedPrivateKey = Ont.SDK.encryptPrivateKey( encryptedPrivateKey, password, callback)
+var encryptedPrivateKey = Ont.SDK.decryptEncryptedPrivateKey( encryptedPrivateKey, password, callback)
 ```
 
-### 4.5 发送认证声明到链上并验证是否发送成功
+### 4.4 发送认证声明到链上并验证是否发送成功
 
 用户可以通过websocket发送声明到链上，并且通过持续监听websocket服务器返回的消息，判断发送是否成功。
 
 用户需要传以下参数：
 
-**path** 是发送的属性在DDO中存储的完整路径。
+**path** 是发送的属性在DDO中存储的完整路径。规定该值为认证声明签名后的值。
 
-**value** 发送的属性值
+**value** 发送的属性值。规定该值为如下结构：
+
+````
+{
+    Context : string, //声明模板的标识
+    Ontid   : string  //声明签发者的ONT ID
+}
+````
 
 **ontid** 用户身份的ONT ID
 
@@ -366,7 +399,7 @@ var param = Ont.SDK.buildClaimTx( path, value, ontid, privateKey)
 
 //2.send websocket request and listen messages
 //websocket服务器地址
-const socket_url = 'ws://192.168.3.128:20335'
+const socket_url = 'ws://52.80.115.91:20335'
 const socket = new WebSocket(socket_url)
     socket.onopen = () => {
         console.log('connected')
@@ -394,7 +427,7 @@ const socket = new WebSocket(socket_url)
     }
 ```
 
-
+**注意：** 发送认证上链并监听返回的过程比较耗时，如果一直等待确认上链成功，会十分影响用户体验，可以在成功发送交易后关闭websocket连接，并在等待**约5秒**后显示上链成功。
 
 ## 5   SDK和原生的交互 
 
@@ -416,7 +449,7 @@ Ont://callback?params=result
 
 ```callback``` 是原生定义的回调函数名。
 
-```params=result``` result就是发送给原生的函数调用结果。
+```params=result``` result就是发送给原生的函数调用结果。该结果是JSON格式。
 
 ```
 // native side call sdk to create a wallet, the callback name is 'getWalletDataStr'
@@ -431,6 +464,22 @@ getWalletDataStr(walletSataStr) {
   //......
 }
 ```
+
+#### 返回结果是如下结构：
+
+````
+{
+    error  : number,  //错误码
+    result : string,  //JSON字符串格式的结果
+    desc   : string   //描述
+}
+````
+
+当错误码为0时，表示成功返回结果，result的值就是JSON格式的结果值；
+
+当错误码不为0时，表示失败返回结果，result可能为空。
+
+desc 描述信息，可能为空。
 
 ### 6 二维码规范
 
@@ -470,9 +519,7 @@ getWalletDataStr(walletSataStr) {
 | 60013    | IllegalAssetId                | 不合法资产编号                    |
 | 60014    | IllegalAmount                 | 不合法数值                        |
 | 60015    | IllegalTxid                   | 不合法交易编号                    |
-
-
-
+| 70000    | UNKNOWN_ONTID                 | 找不到ONT ID                      |
 
 
 
