@@ -11,7 +11,7 @@
 ```
 {
 	name: string;
-    ontid: string;
+    defaultOntid: string;
     createTime: string;
     version: string;
     scrypt: {
@@ -27,7 +27,7 @@
 
 `name` 是用户为钱包所取的名称。
 
-```ontid``` 是钱包唯一ontid。
+```defaultOntid``` 是钱包默认身份的Ont ID，可在显示时使用。
 
 ```createTime``` 是ISO格式表示的钱包的创建时间，如 : "2018-02-06T03:05:12.360Z"
 
@@ -43,7 +43,7 @@
 
 希望了解更多钱包数据规范请参考[Wallet\_File_Specification](https://github.com/ONTIO-Community/ONTO/blob/master/Wallet_File_Specification.md).
 
-### 1.1 创建钱包
+### 1.1 创建新的身份钱包
 
 用户可以通过传递钱包名称和密码来创建新的钱包。创建过程分为两步：**创建钱包文件**和**注册ONT ID**。
 
@@ -66,7 +66,7 @@ Ont.SDK.createWallet('zhangsan', '123456', 'callback')
 
 ```
 
-这个方法内部会创建出相应的交易对象，通过websocket或http发送请求到链上。当交易成功发送后，回调返回创建好的钱包对象JSON格式字符串；否则回调会返回错误信息。错误信息是如下结构：
+这个方法内部会创建出相应的交易对象，通过websocket或http发送请求到链上。当交易成功发送后，回调返回结果，具体结果详见[SDK和原生的交互](#5)
 
 ````
 {
@@ -85,7 +85,7 @@ Ont.SDK.createWallet('zhangsan', '123456', 'callback')
 
 如果返回成功结果的消息，则继续做成功创建的后续处理。
 
-### 1.2 导入身份
+### 1.2 通过导入身份创建钱包
 
 导入身份需要用户提供**身份的名称，加密后的私钥**和**密码**。
 
@@ -104,6 +104,28 @@ Ont.SDK.createWallet('zhangsan', '123456', 'callback')
 ```
 Ont.SDK.importIdentity(label,encryptedPrivateKey, password, callback)
 ```
+
+### 1.3 导入身份到本地钱包
+
+可以通过导入的方式将身份添加到本地钱包。
+
+该方法需要传入的参数如下：
+
+**walletDataStr** 本地钱包文件，JOSN字符串格式。
+
+**label** 导入的身份的名称，可以为空值。
+
+**encryptedPrivateKey** 加密后的私钥。
+
+**password** 用户的密码。
+
+**callback** 回调函数名。
+
+导入的过程同[1.2 通过导入身份创建钱包](#2)
+
+````
+Ont.SDK.importIdentityWithWallet( walletDaatStr, label, encryptedPrivateKey, password, callback)
+````
 
 ## 2. 身份Identity 
 
@@ -504,6 +526,7 @@ desc 描述信息，可能为空。
 | 44003    | UNKNOWN_BLOCK                 | 找不到块                          |
 | 45001    | INVALID_VERSION               | 协议版本错误                      |
 | 45002    | INTERNAL_ERROR                | 内部错误                          |
+| 45010    | ErrTxHashDuplicate            | 交易hash重复                      |
 | 60000    | NETWORK_ERROR                 | 网络错误                          |
 | 60001    | DB_OP_ERROR                   | 数据库操作错误                    |
 | 60002    | NO_BALANCE                    | 余额不足                          |
