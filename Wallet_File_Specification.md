@@ -9,6 +9,9 @@ A wallet file in JSON format has the following basic structure:
   "name": "MyWallet",
   "version": "1.0",
   "scrypt": {},
+  "defaultOntid": "did:ont:TJNxJe2Ty8eSCjCDxDPwiS78NRAn8XPTFL",
+  "defaultAccountAddress": "TJNxJe2Ty8eSCjCDxDPwiS78NRAn8XPTFL",
+  "createTime": "2018-03-14T03:12:30.862Z",
   "identities": [],
   "accounts": [],
   "extra": null
@@ -19,6 +22,12 @@ A wallet file in JSON format has the following basic structure:
 ```version``` is currently fixed at 1.0 and will be used for functional upgrades in the future.
 
 ```scrypt``` is a ScryptParameters object which describe the parameters of SCrypt algorithm used for encrypting and decrypting the private keys in the wallet.
+
+```defaultOntid``` indicates the default identity in this wallet.
+
+```defaultAccountAddress``` indicates the default digital assert account's address in this wallet.
+
+```createTime``` is the createTime of this wallet,in UTC format.
 
 ```identities``` is an array of Identity objects which describe the details of each Identity in the wallet.
 
@@ -39,7 +48,6 @@ Here is an example as below.
 				"parameters": ["Signature"],
 				"script": "210392a4dbb2a44da81e0942cee1a62ff4298e04ed463b88911b97de19a1597fa83dac"
 			},
-			"isDefault": false,
 			"key": "6PYT85poeK8XpuQhnroArEov64NfRsEeB4KiGD1YCoq5xU7sJrnXC92Vey", //加密后的私钥
 			"label": "",
 			"lock": false,
@@ -58,7 +66,6 @@ Here is an example as below.
 				    "curve": "secp256r1"
 				}
 			}],
-			"isDefault": false,
 			"label": "",
 			"lock": false,
 			"ontid": "did:ont:AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG"  //ontid,身份id
@@ -98,7 +105,6 @@ Identity object has the following structure:
 {
   "ontid": "did:ont:TQLASLtT6pWbThcSCYU1biVqhMnzhTgLFq",
   "label": "MyIdentity",
-  "isDefault": true,
   "lock": false,
   "controls": [],
   "extra": null
@@ -107,8 +113,6 @@ Identity object has the following structure:
 ```ontid``` is the ontid of the identity.
 
 ```label``` is a label that the user has made to the identity.
-
-```isDefault``` indicates whether the identity is the default change identity.
 
 ```lock``` indicates whether the identity is locked by user. The client shouldn't update the infomation in a locked identity.
 
@@ -152,7 +156,6 @@ Account object has the following structure:
 {
   "address": "AQLASLtT6pWbThcSCYU1biVqhMnzhTgLFq",
   "label": "MyAddress",
-  "isDefault": true,
   "lock": false,
   "algorithm": "ECDSA",
   "parameters": {},
@@ -164,8 +167,6 @@ Account object has the following structure:
 ```address``` is the base58 encoded address of the account.
 
 ```label``` is a label that the user has made to the account.
-
-```isDefault``` indicates whether the account is the default change account.
 
 ```lock``` indicates whether the account is locked by user. The client shouldn't spend the funds in a locked account.
 
