@@ -12,6 +12,7 @@
 {
 	name: string;
     defaultOntid: string;
+    defaultAccountAddress : string;
     createTime: string;
     version: string;
     scrypt: {
@@ -29,7 +30,9 @@
 
 ```defaultOntid``` 是钱包默认身份的Ont ID，可在显示时使用。
 
-```createTime``` 是ISO格式表示的钱包的创建时间，如 : "2018-02-06T03:05:12.360Z"
+``defaultAccountAddress`` 是钱包默认数字资产的地址。
+
+```createTime``` 是ISO格式表示的钱包的创建时间，如 : "2018-02-06T03:05:12Z"。精确到秒。
 
 `version` 目前为固定值1.0，留待未来功能升级使用。
 
@@ -56,9 +59,7 @@
 **callback** 原生里定义的回调函数名，用来接收sdk返回的结果。关于sdk和原生交互的详细情况见 [sdk和原生的交互](#5)。
 该方法会通过回调将创建好的钱包文件，以JSON字符串的形式，返回给原生。在创建的过程中，需要将钱包中身份的ONT ID注册到链上，注册成功时，代表钱包和身份创建成功。
 
-注册的过程是通过发送相关的交易到链上并被区块接收，这个过程比较耗时，客户端一直等待将会十分影响用户体验，所以注册的过程只需要发送交易，不需要等待确认结果。只要保证交易成功创建和发送，就极大概率上保证上链成功。
-
-注册的过程会耗时约**5秒钟**。
+注册的过程是通过发送相关的交易到链上并被区块接收，这个过程比较耗时，客户端一直等待将会十分影响用户体验，所以注册的过程只需要发送交易，不需要等待确认结果。只要保证交易成功创建和发送，就极大概率上保证上链成功。客户端需要展示上链的提示页面。
 
 ```
 
@@ -67,15 +68,6 @@ Ont.SDK.createWallet('zhangsan', '123456', 'callback')
 ```
 
 这个方法内部会创建出相应的交易对象，通过websocket或http发送请求到链上。当交易成功发送后，回调返回结果，具体结果详见[SDK和原生的交互](#5)
-
-````
-{
-	error : string, //错误码 
-	desc : string // 错误描述
-}
-````
-
-
 
 创建的流程图详见如下：
 
@@ -121,6 +113,8 @@ Ont.SDK.importIdentity(label,encryptedPrivateKey, password, callback)
 
 **callback** 回调函数名。
 
+如果成功导入，该方法会返回添加了新身份后的钱包文件，为JSON格式字符串。
+
 导入的过程同[1.2 通过导入身份创建钱包](#2)
 
 ````
@@ -135,7 +129,6 @@ Ont.SDK.importIdentityWithWallet( walletDaatStr, label, encryptedPrivateKey, pas
 {
   ontid : string,
   label : string,
-  isDefault : boolean,
   lock : boolean,
   controls : array of ControlData,
   extra : null
@@ -145,8 +138,6 @@ Ont.SDK.importIdentityWithWallet( walletDaatStr, label, encryptedPrivateKey, pas
 ```ontid``` 是代表身份的唯一的id
 
 `label` 是用户给身份所取的名称。
-
-`isDefault` 表明身份是用户默认的身份。默认值为false。
 
 `lock` 表明身份是否被用户锁定了。客户端不能更新被锁定的身份信息。默认值为false。
 
@@ -181,7 +172,6 @@ Ont.SDK.importIdentityWithWallet( walletDaatStr, label, encryptedPrivateKey, pas
 {
   address : string,
   label : string,
-  isDefault : boolean,
   lock : boolean,
   algorithm : boolean,
   parameters : {},
@@ -194,8 +184,6 @@ Ont.SDK.importIdentityWithWallet( walletDaatStr, label, encryptedPrivateKey, pas
 ```address``` 是base58编码的账户地址。
 
 ```label``` 是账户的名称。
-
-`isDefault` 表明账户是否是默认的账户。默认值为false。
 
 `lock` 表明账户是否是被用户锁住的。客户端不能消费掉被锁的账户中的资金。
 
@@ -294,7 +282,7 @@ console.log(accountDataStr)
 }
 ```
 
-```Createtime``` 是声明的创建时间。
+```Createtime``` 是声明的创建时间。该值是ISO格式字符串，精确到秒，如‘‘2018-01-01T14:00:01Z’’。
 
 ```Issuer``` 是声明的发布者。对于自认证声明，该值是用户的ONT ID。
 
@@ -348,11 +336,31 @@ var claim = Ont.SDK.signSelfClaim(context, claimData, ontid, encryptedPrivateKey
 
 ### 4.2 工具方法 -- 生成签名
 
-用于对输入内容生成签名的方法，该方法会返回签名后的字符串。
+用于对输入内容生成签名的方法，该方法会返回符合格式要求的签名内容。
+
+签名格式同上面的**Signature**。
+
+````
+{
+	Format : 'pgp', //该值为固定的值
+    Algorithm : ECDSAwithSHA256, //该值为固定的值
+    Value : string //该值为签名后的值
+}
+````
+
+该方法所需参数说明如下：
+
+**content** 需要签名的内容， 字符串格式。
+
+**encryptedPrivateKey** 加密后的私钥。
+
+**password** 用户的密码。
+
+**callback** 回调函数名，可选参数。
 
 ```
-let signatureValue = Ont.core.signatureData(data, privateKey)
-console.log(signatureValue)
+let signature = Ont.SDK.signData(content, encryptedPrivateKey, password, callback)
+console.log(signature.Value)
 ```
 
 ### 4.3 工具方法 — 解密私钥
@@ -434,6 +442,8 @@ const socket = new WebSocket(socket_url)
 		let res 
         if(typeof event.data === 'string') {
             res = JSON.parse(event.data)
+            //可以在成功发送交易后关闭socket
+            socket.close()
         }
         //解析后台推送的Event通知
         //通过简单的判断区块高度，得知上链成功，
