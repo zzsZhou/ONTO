@@ -39,6 +39,31 @@ Here is an example as below.
 
 ```
 {
+	"name": "mywallet",
+	"version": "1.0",
+	"scrypt": {
+		"n": 16384,
+		"p": 8,
+		"r": 8
+	},
+	"defaultOntid": "did:ont:AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG",
+    "defaultAccountAddress": "AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG",
+    "createTime": "2018-03-14T03:12:30.862Z",
+    "identitys": [
+		{
+			"controls": [{
+				"algorithm": "ECDSA",
+				"id": "",
+				"key": "6PYT85poeK8XpuQhnroArEov64NfRsEeB4KiGD1YCoq5xU7sJrnXC92Vey", //加密后的私钥
+				"parameters": {
+				    "curve": "secp256r1"
+				}
+			}],
+			"label": "",
+			"lock": false,
+			"ontid": "did:ont:AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG"  //ontid,身份id
+		}
+	],
 	"accounts": [
 		{
 			"address": "AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG",
@@ -55,29 +80,7 @@ Here is an example as below.
 				 "curve": "secp256r1"
 			}
 		}
-	],
-	"identitys": [
-		{
-			"controls": [{
-				"algorithm": "ECDSA",
-				"id": "",
-				"key": "6PYT85poeK8XpuQhnroArEov64NfRsEeB4KiGD1YCoq5xU7sJrnXC92Vey", //加密后的私钥
-				"parameters": {
-				    "curve": "secp256r1"
-				}
-			}],
-			"label": "",
-			"lock": false,
-			"ontid": "did:ont:AMs5NFdXPgCgC7Dci1FdFttvD42HELoLxG"  //ontid,身份id
-		}
-	],
-	"name": "ontology",
-	"scrypt": {
-		"n": 16384,
-		"p": 8,
-		"r": 8
-	},
-	"version": "v1.0.0"
+	]
 }
 ```
 
