@@ -1,18 +1,18 @@
 ## Social Verification
 
-
+  
 
 ### native call js
 
-
+  
 
 ```
-http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a5452616a31684377615135336264525450635a78596950415a364d61376a6351564b&encryptedPrivateKey=6PYRC4fgNSq7uVC7dUCLbb9GpjnTcFwLqDMQ2zAAX7NNqH47tfirgsNEQw&deviceCode=device38b7902a0c624b42a42ade31b1ad7779&lang=zh_hans
+http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a545241746f73555a484e53694c687a426448616379784d5834426733636a57793372&encryptedPrivateKey=6PYQWiEH4p4CigWKeS1YXa7NavtNGMGxo28JDPyEUwr42QrTetLhwwpn5R&deviceCode=device90894eb863304481b55b9ef595d7b8b3&lang=zh_hans
 ```
 
+  
 
-
-`context`:
+`context`:  
 
 **claim:twitter_authentication** is for twitter authentication.
 
@@ -22,21 +22,33 @@ http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f
 
 **claim:linkedin_authentication** is for linkedin authentication.
 
+  
+
+`ontid`    
+
+需要传hex编码的 `6469643a6f6e743a545241746f73555a484e53694c687a426448616379784d5834426733636a57793372`，原文为 `did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r`  
+
+​    
+
+`encryptedPrivateKey`  
+
+`6PYQWiEH4p4CigWKeS1YXa7NavtNGMGxo28JDPyEUwr42QrTetLhwwpn5R`  
+
+  
+
+`deviceCode`  
+
+  `device90894eb863304481b55b9ef595d7b8b3`
 
 
-`ontid`
 
-`encryptedPrivateKey`
+`lang`:   
 
-`deviceCode`
+​    `en_us`     英文  
 
-`lang`: 
+​    `zh_hans`   中文简体  
 
-​    `en_us`     英文
-
-​    `zh_hans`   中文简体
-
-
+  
 
 ### js return to native
 
