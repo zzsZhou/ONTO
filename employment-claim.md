@@ -5,13 +5,13 @@
 ```json
 {
 	"Id":"2e6e38fc5516832d78307d0ebaed55332b88e163d671a30e18df9f97cfe01fb5",
-	"Context":"claim:staff_authentication",
+	"Context":"claim:employment_authentication",
 	"Content":{
 		"IdNumber": "510806199002122991",
 		"Name": "zhangsan",
 		"Gender":"male",
 		"JobTitle": "SoftwareEngineer",
-		"MonthlyWages": 3000.00,
+		"MonthlySalary": 3000.00,
 		"Hiredata": "2017-03-20",
 	},
 	"Metadata":{
@@ -55,5 +55,5 @@
 |    Name|   String|  姓名  |
 |    Gender|   String| 性别   |
 |    JobTitle|   String|  公司职位  |
-|    MonthlyWages|   Long|  月工资  |
+|    MonthlySalary|   Long|  月工资  |
 |    Hiredata|   String|  入职时间，格式：yyyy-MM-dd  |
