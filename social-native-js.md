@@ -7,7 +7,7 @@
   
 
 ```
-http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f6e743a545241746f73555a484e53694c687a426448616379784d5834426733636a57793372&encryptedPrivateKey=6PYQWiEH4p4CigWKeS1YXa7NavtNGMGxo28JDPyEUwr42QrTetLhwwpn5R&deviceCode=device90894eb863304481b55b9ef595d7b8b3&lang=zh_hans
+http://128.1.132.167:8081?context=claim:linkedin_authentication&ontid=6469643A6F6E743A5450516E4D576B5943524746513274736147314E566E4468446B75466E4D50476D62&encryptedPrivateKey=6PYNuYx2gMxbVGNe7BBUkK8dCg76R2nhuEFmDZVU92JToRqNj9ggFNyDyV&deviceCode=device478b1d3f748548838a075dd39edee07b&lang=zh_hans
 ```
 
   
@@ -26,19 +26,19 @@ http://42.159.233.39:8000?context=claim:linkedin_authentication&ontid=6469643a6f
 
 `ontid`    
 
-需要传hex编码的 `6469643a6f6e743a545241746f73555a484e53694c687a426448616379784d5834426733636a57793372`，原文为 `did:ont:TRAtosUZHNSiLhzBdHacyxMX4Bg3cjWy3r`  
+需要传hex编码的
 
 ​    
 
 `encryptedPrivateKey`  
 
-`6PYQWiEH4p4CigWKeS1YXa7NavtNGMGxo28JDPyEUwr42QrTetLhwwpn5R`  
+`6PYNuYx2gMxbVGNe7BBUkK8dCg76R2nhuEFmDZVU92JToRqNj9ggFNyDyV`  
 
   
 
 `deviceCode`  
 
-  `device90894eb863304481b55b9ef595d7b8b3`
+  `device478b1d3f748548838a075dd39edee07b`
 
 
 
