@@ -12,7 +12,7 @@
 		"Gender":"male",
 		"JobTitle": "SoftwareEngineer",
 		"MonthlySalary": 3000.00,
-		"Hiredata": "2017-03-20",
+		"Hiredata": "2017-03-20"
 	},
 	"Metadata":{
 		"CreateTime":"2017-04-01T22:01:20Z",
@@ -29,18 +29,7 @@
 	"Proof":{
 		"Type":"MerkleProof",
 		"TxnHash":"c89e76ee58ae6ad99cfab829d3bf5bd7e5b9af3e5b38713c9d76ef2dcba2c8e0",
-		"BlockHeight":10,
-		"MerkleRoot":"bfc2ac895685fbb01e22c61462f15f2a6e3544835731a43ae0cba82255a9f904",
-		"Nodes":[
-			{
-				"Direction":"Right",
-				"TargetHash":"2fa49b6440104c2de900699d31506845d244cc0c8c36a2fffb019ee7c0c6e2f6"
-			},
-			{
-				"Direction":"Left",
-				"TargetHash":"fc4990f9758a310e054d166da842dab1ecd15ad9f8f0122ec71946f20ae964a4"
-			}
-		]
+		"BlockHeight":10
 	}
 }
 ```
